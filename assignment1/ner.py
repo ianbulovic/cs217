@@ -26,7 +26,7 @@ class SpacyDocument:
             entities.append((e.start_char, e.end_char, e.label_, e.text))
         return entities
 
-    def get_entities_formatted(self, mode: Literal["html", "st"] = "html"):
+    def get_entities_formatted(self, mode: Literal["html", "st"]):
         entities = self.doc.ents
         starts = {e.start_char: e.label_ for e in entities}
         ends = {e.end_char: e.label_ for e in entities}
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     print(doc.get_tokens())
     for entity in doc.get_entities():
         print(entity)
-    print(doc.get_entities_formatted())
+    print(doc.get_entities_formatted(mode="html"))

@@ -21,6 +21,6 @@ def get_api_info(pretty=False):
 def process(request: TextRequest, pretty=False):
     doc = SpacyDocument(request.text)
     if pretty:
-        return doc.get_entities_formatted()
+        return doc.get_entities_formatted(mode="html")
     else:
         return doc.get_entities()
