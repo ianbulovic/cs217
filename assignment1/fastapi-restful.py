@@ -1,3 +1,5 @@
+# run with `uvicorn fastapi-restful:app`
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 

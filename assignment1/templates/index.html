@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/index.css') }}"
+    />
+  </head>
+  <body>
+    <h2>Input some text to do NER</h2>
+    <form action="/" method="post">
+      <input type="text" name="Text" />
+      <input type="submit" value="Submit" />
+    </form>
+    <h2>Result</h2>
+    {% if result %}
+    <div>{{ result | safe }}</div>
+    {% endif %}
+  </body>
+</html>

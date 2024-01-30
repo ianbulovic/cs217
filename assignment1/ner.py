@@ -34,10 +34,10 @@ class SpacyDocument:
             if p in ends:
                 buffer.write("</entity>")
             if p in starts:
-                buffer.write('<entity class="%s">' % starts[p])
+                buffer.write(f'<entity class="{starts[p]}">')
             buffer.write(char)
         markup = buffer.getvalue()
-        return "<markup>%s</markup>" % markup
+        return f"<markup>{markup}</markup>"
 
 
 if __name__ == "__main__":
