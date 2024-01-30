@@ -13,7 +13,7 @@ def index():
     if request.method == "POST":
         text = request.form.get("Text", type=str)
         doc = SpacyDocument(text)  # type: ignore
-        result = doc.get_entities_with_markup()
+        result = doc.get_entities_formatted()
         return render_template("index.html", result=result)
     else:  # request.method == "GET"
         return render_template("index.html", result=None)

@@ -16,15 +16,5 @@ text = (
 txt = st.text_area("Text to analyze", text)
 if st.button("run"):
     doc = SpacyDocument(txt)
-    ents = doc.get_entities()
-    result = []
-    i = 0
-    color_idx = 0
-    colors = ["red", "orange", "green", "blue", "violet", "gray"]
-    for start_idx, end_idx, label, content in ents:
-        result.append(txt[i:start_idx])
-        result.append(f":{colors[color_idx % len(colors)]}[**{content}** (*{label}*)]")
-        color_idx += 1
-        i = end_idx
-
-    st.info("".join(result))
+    result = doc.get_entities_formatted(mode="st")
+    st.info(result)
