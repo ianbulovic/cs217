@@ -43,7 +43,7 @@ class SpacyDocument:
             return f"<markup>{markup}</markup>"
         else:  # mode == "st"
             color_idx = 0
-            colors = ["red", "orange", "green", "blue", "violet", "gray"]
+            colors = ["red", "orange", "green", "blue", "violet"]
             for i, char in enumerate(self.text):
                 if i in ends:
                     buffer.write(f"** (*{ends[i]}*)]")
