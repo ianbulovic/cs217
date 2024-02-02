@@ -2,7 +2,7 @@
 
 from flask import Flask, request, render_template
 
-from ner import SpacyDocument
+from nlp import SpacyDocument
 
 
 app = Flask(__name__)
@@ -13,8 +13,9 @@ def index():
     if request.method == "POST":
         text = request.form.get("Text", type=str)
         doc = SpacyDocument(text)  # type: ignore
-        result = doc.get_entities_formatted(mode="html")
-        return render_template("index.html", result=result)
+        ents = doc.get_entities_formatted(mode="html")
+        deps = doc.get_dependencies_formatted()
+        return render_template("index.html", ents=ents, deps=deps)
     else:  # request.method == "GET"
         return render_template("index.html", result=None)
 

@@ -7,7 +7,11 @@
  *
  */
 
-div {
+body {
+    margin: 30px
+}
+
+.ents {
     border: thin solid black;
     padding: 8px;
 }
@@ -69,4 +73,9 @@ span.category {
     border-radius: 0.35em;
     vertical-align: middle;
     margin-left: 0.5rem;
+}
+
+.grid-container {
+    display: grid;
+    grid: auto-flow 30px / repeat(3, 100px);
 }

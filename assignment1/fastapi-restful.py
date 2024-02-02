@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-from ner import SpacyDocument
+from assignment1.nlp import SpacyDocument
 
 app = FastAPI()
 

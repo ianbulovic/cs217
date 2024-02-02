@@ -6,14 +6,23 @@
     />
   </head>
   <body>
-    <h2>Input some text to do NER</h2>
-    <form action="/" method="post">
-      <input type="text" name="Text" />
-      <input type="submit" value="Submit" />
-    </form>
-    <h2>Result</h2>
-    {% if result %}
-    <div>{{ result | safe }}</div>
+    <div class="input-area">
+      <h2>Input some text for NER and dependency parsing:</h2>
+      <form action="/" method="post">
+        <input type="text" name="Text" />
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+    {% if ents %}
+    <div class="ents-area">
+      <h2>Entities</h2>
+      <div class="ents">{{ ents | safe }}</div>
+    </div>
+    {% endif %} {% if deps %}
+    <div class="deps-area">
+      <h2>Dependencies</h2>
+      <div class="grid-container">{{ deps | safe }}</div>
+    </div>
     {% endif %}
   </body>
 </html>

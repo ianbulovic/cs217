@@ -1,7 +1,7 @@
 # run with `streamlit run streamlit-app.py`
 
 import streamlit as st
-from ner import SpacyDocument
+from nlp import SpacyDocument
 
 st.markdown("### SpaCy NER")
 

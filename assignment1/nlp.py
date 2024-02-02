@@ -1,6 +1,6 @@
-"""ner.py
+"""nlp.py
 
-Run spaCy NER over an input string and insert XML tags for each entity.
+Run spaCy NER and dependency parsing over an input string.
 
 """
 
@@ -42,16 +42,34 @@ class SpacyDocument:
             markup = buffer.getvalue()
             return f"<markup>{markup}</markup>"
         else:  # mode == "st"
-            color_idx = 0
+            # mantain consistent mapping from entity labels to colors
+            color_map = {}
             colors = ["red", "orange", "green", "blue", "violet"]
             for i, char in enumerate(self.text):
                 if i in ends:
+                    # close bold block and write label in italics, e.g. "** (*ORG*)"
                     buffer.write(f"** (*{ends[i]}*)]")
                 if i in starts:
-                    buffer.write(f":{colors[color_idx % len(colors)]}[**")
-                    color_idx += 1
+                    # if this is a new entity label, assign it the next color
+                    if starts[i] not in color_map.keys():
+                        color_map[starts[i]] = colors[len(color_map) % len(colors)]
+                    # apply color and start bold block, e.g. ":red[**"
+                    buffer.write(f":{color_map[starts[i]]}[**")
                 buffer.write(char)
             return buffer.getvalue()
+
+    def get_dependencies(self):
+        dependencies: list[tuple[int, int, str]] = []
+        for token in self.doc:
+            dependencies.append((token.head.i, token.i, token.dep_))
+        return dependencies
+
+    def get_dependencies_formatted(self):
+        buffer = io.StringIO()
+        for parent_idx, child_idx, dep in self.get_dependencies():
+            for grid_item in [self.doc[parent_idx].text, dep, self.doc[child_idx].text]:
+                buffer.write(f'<div class="grid-item">{grid_item}</div>\n')
+        return buffer.getvalue()
 
 
 if __name__ == "__main__":
@@ -66,7 +84,9 @@ if __name__ == "__main__":
     )
 
     doc = SpacyDocument(example)
-    print(doc.get_tokens())
-    for entity in doc.get_entities():
-        print(entity)
-    print(doc.get_entities_formatted(mode="html"))
+    # print(doc.get_tokens())
+    # for entity in doc.get_entities():
+    #     print(entity)
+    # print(doc.get_entities_formatted(mode="html"))
+
+    print(doc.get_dependencies_formatted())
