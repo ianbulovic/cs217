@@ -14,7 +14,7 @@ def index():
         text = request.form.get("Text", type=str)
         doc = SpacyDocument(text)  # type: ignore
         ents = doc.get_entities_formatted(mode="html")
-        deps = doc.get_dependencies_formatted()
+        deps = doc.get_dependencies_formatted(mode="html")
         return render_template("index.html", ents=ents, deps=deps)
     else:  # request.method == "GET"
         return render_template("index.html", result=None)

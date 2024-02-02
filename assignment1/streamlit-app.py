@@ -17,5 +17,7 @@ default_text = (
 text = st.text_area("Text to analyze", default_text)
 if st.button("run"):
     doc = SpacyDocument(text)
-    result = doc.get_entities_formatted(mode="st")
-    st.info(result)
+    ents = doc.get_entities_formatted(mode="st")
+    st.info(ents)
+    deps = doc.get_dependencies_formatted(mode="st")
+    st.graphviz_chart(deps)

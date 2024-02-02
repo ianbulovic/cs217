@@ -64,11 +64,25 @@ class SpacyDocument:
             dependencies.append((token.head.i, token.i, token.dep_))
         return dependencies
 
-    def get_dependencies_formatted(self):
+    def get_dependencies_formatted(self, mode: Literal["html", "st"]):
         buffer = io.StringIO()
-        for parent_idx, child_idx, dep in self.get_dependencies():
-            for grid_item in [self.doc[parent_idx].text, dep, self.doc[child_idx].text]:
-                buffer.write(f'<div class="grid-item">{grid_item}</div>\n')
+        if mode == "html":
+            for parent_idx, child_idx, dep in self.get_dependencies():
+                for grid_item in [
+                    self.doc[parent_idx].text,
+                    dep,
+                    self.doc[child_idx].text,
+                ]:
+                    buffer.write(f'<div class="grid-item">{grid_item}</div>\n')
+        else:  # mode == "st"
+            buffer.write("digraph {\n")
+            for parent_idx, child_idx, dep in self.get_dependencies():
+                parent_text = self.doc[parent_idx].text
+                child_text = self.doc[child_idx].text
+                buffer.write(
+                    f'    "{parent_text}" -> "{child_text}" [label = "{dep}"]\n'
+                )
+            buffer.write("}\n")
         return buffer.getvalue()
 
 
@@ -89,4 +103,4 @@ if __name__ == "__main__":
     #     print(entity)
     # print(doc.get_entities_formatted(mode="html"))
 
-    print(doc.get_dependencies_formatted())
+    print(doc.get_dependencies_formatted(mode="st"))
