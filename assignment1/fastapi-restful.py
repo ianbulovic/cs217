@@ -16,7 +16,7 @@ class TextRequest(BaseModel):
 @app.get("/")
 def get_api_info(pretty=False):
     content = "Content-Type: application/json"
-    url = "http://127.0.0.1:8000/"
+    url = "http://127.0.0.1:8000/<ner|dep>"
     response = {
         "description": "Interface to the spaCy entity extractor",
         "usage": f'curl {url} -H "{content}" -d@input.json',
