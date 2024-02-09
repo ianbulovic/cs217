@@ -1,5 +1,6 @@
 # run with `streamlit run streamlit-app.py`
 
+import pandas as pd
 import streamlit as st
 from nlp import SpacyDocument
 
@@ -19,5 +20,21 @@ if st.button("run"):
     doc = SpacyDocument(text)
     ents = doc.get_entities_formatted(mode="st")
     st.info(ents)
-    deps = doc.get_dependencies_formatted(mode="st")
-    st.graphviz_chart(deps)
+    table_tab, graph_tab = st.tabs(("Table", "Graph"))
+    with table_tab:
+        deps = doc.get_dependencies()
+        df = pd.DataFrame(deps, columns=["Parent Index", "Child Index", "Dependency"])
+        df.insert(
+            0,
+            "Parent Token",
+            [doc.doc[idx].text for idx in map(lambda dep: dep[0], deps)],
+        )
+        df.insert(
+            2,
+            "Child Token",
+            [doc.doc[idx].text for idx in map(lambda dep: dep[1], deps)],
+        )
+        st.dataframe(df)
+    with graph_tab:
+        deps_graphviz: str = doc.get_dependencies_formatted(mode="st")  # type: ignore
+        st.graphviz_chart(deps_graphviz)
