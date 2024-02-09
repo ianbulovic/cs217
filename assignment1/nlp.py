@@ -21,9 +21,9 @@ class SpacyDocument:
         return [token.lemma_ for token in self.doc]
 
     def get_entities(self):
-        entities: list[tuple[int, int, str, str]] = []
+        entities: dict[str, tuple[str, int, int]] = {}
         for e in self.doc.ents:
-            entities.append((e.start_char, e.end_char, e.label_, e.text))
+            entities[e.text] = (e.label_, e.start_char, e.end_char)
         return entities
 
     def get_entities_formatted(self, mode: Literal["html", "st"]):
@@ -64,9 +64,23 @@ class SpacyDocument:
             dependencies.append((token.head.i, token.i, token.dep_))
         return dependencies
 
-    def get_dependencies_formatted(self, mode: Literal["html", "st"]):
+    def get_dependencies_formatted(
+        self,
+        mode: Literal[
+            "json",
+            "html",
+            "st",
+        ],
+    ):
         buffer = io.StringIO()
-        if mode == "html":
+        if mode == "json":
+            result: dict[str, tuple[str, str]] = {}
+            for parent_idx, child_idx, dep in self.get_dependencies():
+                parent = self.doc[parent_idx].text
+                child = self.doc[child_idx].text
+                result[parent] = (dep, child)
+            return result
+        elif mode == "html":
             for parent_idx, child_idx, dep in self.get_dependencies():
                 for grid_item in [
                     self.doc[parent_idx].text,
@@ -98,9 +112,5 @@ if __name__ == "__main__":
     )
 
     doc = SpacyDocument(example)
-    # print(doc.get_tokens())
-    # for entity in doc.get_entities():
-    #     print(entity)
-    # print(doc.get_entities_formatted(mode="html"))
 
     print(doc.get_dependencies_formatted(mode="st"))

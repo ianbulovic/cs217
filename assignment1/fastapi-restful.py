@@ -1,9 +1,10 @@
 # run with `uvicorn fastapi-restful:app`
 
-from fastapi import FastAPI
+import json
+from fastapi import FastAPI, Response
 from pydantic import BaseModel
 
-from assignment1.nlp import SpacyDocument
+from nlp import SpacyDocument
 
 app = FastAPI()
 
@@ -14,13 +15,37 @@ class TextRequest(BaseModel):
 
 @app.get("/")
 def get_api_info(pretty=False):
-    return {"message": "API info goes here"}
+    content = "Content-Type: application/json"
+    url = "http://127.0.0.1:8000/"
+    response = {
+        "description": "Interface to the spaCy entity extractor",
+        "usage": f'curl {url} -H "{content}" -d@input.json',
+    }
+    if pretty:
+        response = prettify(response)
+    return response
 
 
-@app.post("/")
-def process(request: TextRequest, pretty=False):
+@app.post("/ner")
+def ner(request: TextRequest, pretty=False):
+    doc = SpacyDocument(request.text)
+    response = doc.get_entities()
+    if pretty:
+        response = prettify(response)
+    return response
+
+
+@app.post("/dep")
+def dep(request: TextRequest, pretty=False):
     doc = SpacyDocument(request.text)
     if pretty:
-        return doc.get_entities_formatted(mode="html")
+        response = doc.get_dependencies_formatted("json")
+        response = prettify(response)
     else:
-        return doc.get_entities()
+        response = doc.get_dependencies()
+    return response
+
+
+def prettify(result):
+    json_str = json.dumps(result, indent=2)
+    return Response(content=json_str, media_type="application/json")
