@@ -1,8 +1,9 @@
 # run with `streamlit run streamlit-app.py`
 
+from io import StringIO
 import pandas as pd
 import streamlit as st
-from nlp import SpacyDocument
+from nlp import SpacyDocument, LabeledEntity
 
 st.markdown("### SpaCy NER")
 
@@ -15,26 +16,57 @@ default_text = (
     "this week."
 )
 
+
+def format_entities(doc: SpacyDocument):
+    color_map = {}
+    colors = ["red", "orange", "green", "blue", "violet"]
+
+    def wrap_entity(le: LabeledEntity):
+        if le.label is None:
+            return le.text
+        else:
+            next_color = colors[len(color_map) % len(colors)]
+            color = color_map.setdefault(le.label, next_color)
+            return f":{color}[**{le.text}** (*{le.label}*)]"
+
+    return "".join(wrap_entity(le) for le in doc.get_entities())
+
+
+def dependency_graph(doc: SpacyDocument) -> str:
+    buffer = StringIO()
+    buffer.write("digraph {\n")
+    buffer.writelines(
+        f'    "{dep.parent}" -> "{dep.child}" [label = "{dep.rel}"]'
+        for dep in doc.get_dependencies()
+    )
+    buffer.write("}\n")
+    return buffer.getvalue()
+
+
 text = st.text_area("Text to analyze", default_text)
+
 if st.button("run"):
+
     doc = SpacyDocument(text)
-    ents = doc.get_entities_formatted(mode="st")
+
+    ents = format_entities(doc)
     st.info(ents)
+
+    deps = doc.get_dependencies()
+    df = pd.DataFrame(
+        {
+            "Parent Index": dep.parent_idx,
+            "Parent Token": dep.parent,
+            "Child Index": dep.child_idx,
+            "Child Token": dep.child,
+            "Dependency": dep.rel,
+        }
+        for dep in deps
+    )
+
     table_tab, graph_tab = st.tabs(("Table", "Graph"))
     with table_tab:
-        deps = doc.get_dependencies()
-        df = pd.DataFrame(deps, columns=["Parent Index", "Child Index", "Dependency"])
-        df.insert(
-            0,
-            "Parent Token",
-            [doc.doc[idx].text for idx in map(lambda dep: dep[0], deps)],
-        )
-        df.insert(
-            2,
-            "Child Token",
-            [doc.doc[idx].text for idx in map(lambda dep: dep[1], deps)],
-        )
         st.dataframe(df)
     with graph_tab:
-        deps_graphviz: str = doc.get_dependencies_formatted(mode="st")  # type: ignore
+        deps_graphviz: str = dependency_graph(doc)
         st.graphviz_chart(deps_graphviz)
