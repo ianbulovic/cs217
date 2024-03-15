@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/index.css') }}"
+    />
+  </head>
+  <body>
+    <a href="{{ url_for('index') }}">
+      <button>Back</button>
+    </a>
+    <h1>Database</h1>
+    <div class="db-area">
+        <table>
+            <tr>
+                <th>Entity</th>
+                <th>Dependencies</th>  
+            </tr>
+            {% for pair in ents %}
+                <tr>
+                    <td>{{ pair.0 }}</td>
+                    <td>
+                        <ul>
+                            {% for dependency in pair.1 %}
+                                <li>{{ dependency }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}          
+    </div>
+  </body>
+</html>

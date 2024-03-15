@@ -13,6 +13,21 @@ class TextRequest(BaseModel):
     text: str
 
 
+def format_entities(doc: SpacyDocument):
+    result: list[tuple[str, str, int, int]] = []
+    for le in doc.get_entities():
+        if le.label is not None:
+            result.append((le.text, le.label, le.start_idx, le.end_idx))
+    return result
+
+
+def format_dependencies(doc: SpacyDocument):
+    result: list[tuple[str, str, str]] = []
+    for dep in doc.get_dependencies():
+        result.append((dep.parent, dep.rel, dep.child))
+    return result
+
+
 @app.get("/")
 def get_api_info(pretty=False):
     content = "Content-Type: application/json"
@@ -29,7 +44,7 @@ def get_api_info(pretty=False):
 @app.post("/ner")
 def ner(request: TextRequest, pretty=False):
     doc = SpacyDocument(request.text)
-    response = doc.get_entities()
+    response = format_entities(doc)
     if pretty:
         response = prettify(response)
     return response
@@ -39,7 +54,7 @@ def ner(request: TextRequest, pretty=False):
 def dep(request: TextRequest, pretty=False):
     doc = SpacyDocument(request.text)
     if pretty:
-        response = doc.get_dependencies_formatted("json")
+        response = format_dependencies(doc)
         response = prettify(response)
     else:
         response = doc.get_dependencies()
